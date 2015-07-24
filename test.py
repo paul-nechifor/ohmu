@@ -3,7 +3,7 @@ from unittest import TestCase
 import ohmu
 
 
-class TestFile(TestCase):
+class File(TestCase):
     def test_dirs_have_the_size_of_their_children(self):
         a = ohmu.File('a', is_dir=True)
         b = ohmu.File('b', is_dir=True)

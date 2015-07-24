@@ -29,7 +29,7 @@ subcommand_all() {
 }
 
 subcommand_install() {
-  virtualenv env
+  [[ -d env ]] || virtualenv env
   . env/bin/activate
   pip install pip setuptools -U
   python setup.py install
@@ -48,7 +48,7 @@ subcommand_clean() {
 
 subcommand_lint() {
   local args=(
-    --max-complexity 6
+    --max-complexity 8
     --exclude=.ropeproject
   )
   flake8 "${args[@]}" ohmu.py > qa_reports/flake8 || true
