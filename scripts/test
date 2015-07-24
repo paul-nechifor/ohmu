@@ -48,7 +48,7 @@ subcommand_clean() {
 
 subcommand_lint() {
   local args=(
-    --max-complexity 8
+    --max-complexity 7
     --exclude=.ropeproject
   )
   flake8 "${args[@]}" ohmu.py > qa_reports/flake8 || true
