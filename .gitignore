@@ -1,2 +1,6 @@
 *.egg-info
+.eggs/
+/build
+/dist
 /env
+/qa_reports
