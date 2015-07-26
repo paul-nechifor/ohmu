@@ -323,4 +323,8 @@ def main(name, args):
     Ohmu(root_path).start()
 
 
+def entry_point():
+    main('__main__', sys.argv[1:])
+
+
 main(__name__, sys.argv[1:])
