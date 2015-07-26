@@ -36,7 +36,8 @@ subcommand_install() {
   pip install \
       'coverage==3.7.1' \
       'flake8==2.4.1' \
-      'green==1.11.0'
+      'green==1.11.0' \
+      'pudb==2015.3'
   python setup.py test
 }
 
