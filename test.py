@@ -6,6 +6,7 @@ import os
 import shutil
 
 import ohmu
+from ohmu import coffee_string
 
 
 class TestCase(BaseTestCase):
@@ -88,3 +89,132 @@ class Scanner(TestCase):
             else:
                 os.mkdir(path)
                 self.create_file_structure(value, path)
+
+
+class Canvas(TestCase):
+    def _test_one_dir(self):
+        a = ohmu.File('a', is_dir=True, path='/')
+        a.add_child(ohmu.File('b', size=5))
+        canvas = ohmu.Canvas(10, 7)
+        canvas.draw(a)
+
+        self.assertEqual(
+            canvas.get_string(),
+            coffee_string(r"""
+                /a-------\
+                |/b-----\|
+                ||      ||
+                |\------/|
+                \--------/
+            """)
+        )
+
+    def test_limits_1_1(self):
+        self.with_size(1, 1, """
+            *
+        """)
+
+    def test_limits_2_1(self):
+        self.with_size(2, 1, """
+            <>
+        """)
+
+    def test_limits_3_1(self):
+        self.with_size(3, 1, """
+            <a>
+        """)
+
+    def test_limits_4_1(self):
+        self.with_size(4, 1, """
+            <a->
+        """)
+
+    def test_limits_5_1(self):
+        self.with_size(5, 1, """
+            <a-->
+        """)
+
+    def test_limits_1_2(self):
+        self.with_size(1, 2, """
+            ^
+            v
+        """)
+
+    def test_limits_1_3(self):
+        self.with_size(1, 3, """
+            ^
+            a
+            v
+        """)
+
+    def test_limits_1_4(self):
+        self.with_size(1, 4, """
+            ^
+            a
+            |
+            v
+        """)
+
+    def test_limits_1_5(self):
+        self.with_size(1, 5, """
+            ^
+            a
+            |
+            |
+            v
+        """)
+
+    def test_limits_2_2(self):
+        self.with_size(2, 2, r"""
+            /\
+            \/
+        """)
+
+    def test_limits_3_2(self):
+        self.with_size(3, 2, r"""
+            /a\
+            \-/
+        """)
+
+    def test_limits_2_3(self):
+        self.with_size(2, 3, r"""
+            /\
+            a|
+            \/
+        """)
+
+    def with_size(self, width, height, str):
+        canvas = ohmu.Canvas(width, height)
+        canvas.draw(ohmu.File('a', is_dir=True, path='/'))
+        self.assertEqual(canvas.get_string(), coffee_string(str))
+
+
+class Utils(TestCase):
+    def test_coffee_string(self):
+        list = [
+            (
+                """
+                    a
+                """,
+                'a',
+            ),
+            (
+                """
+                    aa
+                    bbb
+                """,
+                'aa\nbbb',
+            ),
+            (
+                """
+                    xx
+                        yyyy
+                        zzzz
+                    nn
+                """,
+                'xx\n    yyyy\n    zzzz\nnn',
+            ),
+        ]
+
+        for coffee, normal in list:
+            self.assertEqual(coffee_string(coffee), normal)
