@@ -42,7 +42,7 @@ class Scanner(Thread):
     def __init__(self, root_path):
         super(Scanner, self).__init__()
         self.lock = RLock()
-        self.finished = False
+        self.daemon = True
         path = abspath(root_path)
         self.root = File(basename(path), is_dir=True, path=path)
 
@@ -81,18 +81,22 @@ class Canvas(object):
         self.width = width
         self.height = height
         self.table = [
-            [[' ', 0] for y in xrange(width)]
+            [[' ', 2] for y in xrange(width)]
             for i in xrange(height)
         ]
 
     def draw(self, file):
-        self.draw_object(file, 0, self.width - 1, 0, self.height - 1)
+        self.draw_object(file, 0, 0, self.width - 1, 0, self.height - 1)
 
-    def draw_object(self, object, sx, tx, sy, ty):
+    def draw_object(self, object, l, sx, tx, sy, ty):  # noqa
         dx = tx - sx + 1
         dy = ty - sy + 1
         t = self.table
         name = object.name
+
+        for x in xrange(dx):
+            for y in xrange(dy):
+                t[sy + y][sx + x][1] = 1 + l % 7
 
         if dx == 1 and dy == 1:
             t[sy][sx][0] = '*'
@@ -127,15 +131,19 @@ class Canvas(object):
         self.fill_vertical(t, tx, sy + 1, dy - 2)
 
         if dx > 2 and dy > 2 and object.children:
-            self.draw_children(object.children, sx + 1, tx - 1, sy + 1, ty - 1)
+            self.draw_children(
+                object.children, l + 1,
+                sx + 1, tx - 1,
+                sy + 1, ty - 1,
+            )
 
     def fill_vertical(self, t, sx, sy, ny):
         for i in xrange(ny):
-            t[sy + i][sx] = '|'
+            t[sy + i][sx][0] = '|'
 
     def fill_horizontal(self, t, sx, sy, nx):
         for i in xrange(nx):
-            t[sy][sx + i] = '-'
+            t[sy][sx + i][0] = '-'
 
     def fill_horizontal_name(self, name, t, sx, sy, nx):
         if nx <= 0:
@@ -145,11 +153,11 @@ class Canvas(object):
         if left > 0:
             name += '-' * left
         for i, c in enumerate(name):
-            t[sy][sx + i] = c
+            t[sy][sx + i][0] = c
 
-    def draw_children(self, children, sx, tx, sy, ty):
+    def draw_children(self, children, l, sx, tx, sy, ty):
         if len(children) == 1:
-            self.draw_object(children[0], sx, tx, sy, ty)
+            self.draw_object(children[0], l, sx, tx, sy, ty)
             return
         lists = [[], []]
         sizes = [0, 0]
@@ -170,26 +178,26 @@ class Canvas(object):
         if dx > dy:
             dx2 = int(math.ceil(dx * ratio))
             self.draw_children(
-                lists[0],
+                lists[0], l,
                 sx, sx + dx2 - 1,
                 sy, ty,
             )
             if dx2 < dx:
                 self.draw_children(
-                    lists[1],
+                    lists[1], l,
                     sx + dx2, tx,
                     sy, ty,
                 )
         if dx < dy:
             dy2 = int(math.ceil(dy * ratio))
             self.draw_children(
-                lists[0],
+                lists[0], l,
                 sx, tx,
                 sy, sy + dy2 - 1,
             )
             if dy2 < dy:
                 self.draw_children(
-                    lists[1],
+                    lists[1], l,
                     sx, tx,
                     sy + dy2, ty,
                 )
@@ -203,6 +211,9 @@ class Screen(object):
     def __init__(self):
         self.screen = curses.initscr()
         curses.start_color()
+        curses.use_default_colors()
+        for i in range(0, min(curses.COLORS, 8)):
+            curses.init_pair(i + 1, 15, i)
         self.height = -1
         self.width = -1
 
@@ -221,7 +232,7 @@ class Screen(object):
 
         for i, line in enumerate(canvas.table[:-1]):
             for j, [char, color] in enumerate(line):
-                self.screen.addstr(i, j, char)
+                self.screen.addch(i, j, char, curses.color_pair(color))
 
         self.screen.refresh()
 
