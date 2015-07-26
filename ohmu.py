@@ -4,6 +4,7 @@ from os.path import abspath, basename, join
 from stat import S_ISDIR, S_ISREG
 from threading import Thread, RLock
 import curses
+import math
 import os
 import re
 import sys
@@ -31,7 +32,7 @@ class File(object):
             parent = parent.parent
 
     def sortAll(self):
-        self.children.sort(key=lambda x: -x.size)
+        self.children.sort(key=lambda x: (-x.size, x.name))
         for x in self.children:
             x.sortAll()
 
@@ -87,25 +88,7 @@ class Canvas(object):
     def draw(self, file):
         self.draw_object(file, 0, self.width - 1, 0, self.height - 1)
 
-    def fill_vertical(self, t, sx, sy, ny):
-        for i in xrange(ny):
-            t[sy + i][sx] = '|'
-
-    def fill_horizontal(self, t, sx, sy, nx):
-        for i in xrange(nx):
-            t[sy][sx + i] = '-'
-
-    def fill_horizontal_name(self, name, t, sx, sy, nx):
-        if nx <= 0:
-            return
-        name = name[:nx]
-        left = nx - len(name)
-        if left > 0:
-            name += '-' * left
-        for i, c in enumerate(name):
-            t[sy][sx + i] = c
-
-    def draw_object(self, object, sx, tx, sy, ty):  # noqa
+    def draw_object(self, object, sx, tx, sy, ty):
         dx = tx - sx + 1
         dy = ty - sy + 1
         t = self.table
@@ -142,6 +125,74 @@ class Canvas(object):
 
         self.fill_horizontal(t, sx + 1, ty, dx - 2)
         self.fill_vertical(t, tx, sy + 1, dy - 2)
+
+        if dx > 2 and dy > 2 and object.children:
+            self.draw_children(object.children, sx + 1, tx - 1, sy + 1, ty - 1)
+
+    def fill_vertical(self, t, sx, sy, ny):
+        for i in xrange(ny):
+            t[sy + i][sx] = '|'
+
+    def fill_horizontal(self, t, sx, sy, nx):
+        for i in xrange(nx):
+            t[sy][sx + i] = '-'
+
+    def fill_horizontal_name(self, name, t, sx, sy, nx):
+        if nx <= 0:
+            return
+        name = name[:nx]
+        left = nx - len(name)
+        if left > 0:
+            name += '-' * left
+        for i, c in enumerate(name):
+            t[sy][sx + i] = c
+
+    def draw_children(self, children, sx, tx, sy, ty):
+        if len(children) == 1:
+            self.draw_object(children[0], sx, tx, sy, ty)
+            return
+        lists = [[], []]
+        sizes = [0, 0]
+        i = 0
+        for child in children:
+            lists[i].append(child)
+            sizes[i] += child.size
+            i = int(sizes[0] > sizes[1])
+
+        # The first list has to be the largest.
+        if sizes[0] < sizes[1]:
+            sizes = sizes[::-1]
+            lists = lists[::-1]
+
+        dx = tx - sx + 1
+        dy = ty - sy + 1
+        ratio = sizes[0] / float(sizes[0] + sizes[1])
+        if dx > dy:
+            dx2 = int(math.ceil(dx * ratio))
+            self.draw_children(
+                lists[0],
+                sx, sx + dx2 - 1,
+                sy, ty,
+            )
+            if dx2 < dx:
+                self.draw_children(
+                    lists[1],
+                    sx + dx2, tx,
+                    sy, ty,
+                )
+        if dx < dy:
+            dy2 = int(math.ceil(dy * ratio))
+            self.draw_children(
+                lists[0],
+                sx, tx,
+                sy, sy + dy2 - 1,
+            )
+            if dy2 < dy:
+                self.draw_children(
+                    lists[1],
+                    sx, tx,
+                    sy + dy2, ty,
+                )
 
     def get_string(self):
         return '\n'.join(''.join(y[0] for y in x) for x in self.table)

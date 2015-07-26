@@ -15,6 +15,19 @@ class TestCase(BaseTestCase):
         for a, b in zip(*(iter(args),) * 2):
             self.assertEqual(a, b)
 
+    def assertEqual(self, a, b):
+        if not (isinstance(a, basestring) or isinstance(b, basestring)):
+            return super(TestCase, self).assertEqual(a, b)
+        if a != b:
+            raise AssertionError(coffee_string("""
+                Strings are different:
+                ===================================================
+                %s
+                ---------------------------------------------------
+                %s
+                ===================================================
+            """) % (a, b))
+
 
 class File(TestCase):
 
@@ -92,23 +105,6 @@ class Scanner(TestCase):
 
 
 class Canvas(TestCase):
-    def _test_one_dir(self):
-        a = ohmu.File('a', is_dir=True, path='/')
-        a.add_child(ohmu.File('b', size=5))
-        canvas = ohmu.Canvas(10, 7)
-        canvas.draw(a)
-
-        self.assertEqual(
-            canvas.get_string(),
-            coffee_string(r"""
-                /a-------\
-                |/b-----\|
-                ||      ||
-                |\------/|
-                \--------/
-            """)
-        )
-
     def test_limits_1_1(self):
         self.with_size(1, 1, """
             *
@@ -183,10 +179,95 @@ class Canvas(TestCase):
             \/
         """)
 
+    def test_one_file(self):
+        self.with_nested(10, 5, {
+            'a': {'b': 5}
+        }, r"""
+            /a-------\
+            |/b-----\|
+            ||      ||
+            |\------/|
+            \--------/
+        """
+        )
+
+    def test_two_files(self):
+        self.with_nested(12, 5, {
+            'a': {'bb': 5, 'c': 5}
+        }, r"""
+            /a---------\
+            |/bb-\/c--\|
+            ||   ||   ||
+            |\---/\---/|
+            \----------/
+        """
+        )
+
+    def test_complex_files(self):
+        self.with_nested(42, 12, {
+            'a': {
+                'bb': 5,
+                'c': 5,
+                'dd': {
+                    'f': 4,
+                    'g': 8,
+                },
+                'e': {
+                    'h': 5,
+                    'i': 6,
+                    'j': 8,
+                    'k': {
+                        'l': 14,
+                    },
+                },
+            },
+        }, r"""
+            /a---------------------------------------\
+            |/e---------------------\/dd-----\/bb---\|
+            ||/k-------\/h\/j---\/i\||/g----\||     ||
+            |||/l-----\|| ||    || ||||     |||     ||
+            ||||      ||| ||    || ||||     |||     ||
+            ||||      ||| ||    || ||||     ||\-----/|
+            ||||      ||| ||    || ||||     ||/c----\|
+            ||||      ||| ||    || |||\-----/||     ||
+            |||\------/|| ||    || |||/f----\||     ||
+            ||\--------/\-/\----/\-/||\-----/||     ||
+            |\----------------------/\-------/\-----/|
+            \----------------------------------------/
+        """
+        )
+
     def with_size(self, width, height, str):
         canvas = ohmu.Canvas(width, height)
         canvas.draw(ohmu.File('a', is_dir=True, path='/'))
         self.assertEqual(canvas.get_string(), coffee_string(str))
+
+    def with_nested(self, width, height, structure, str):
+        a = ohmu.File('a', is_dir=True, path='/')
+        a.add_child(ohmu.File('b', size=5))
+
+        self.assertEqual(len(structure), 1)
+        root = ohmu.File(structure.keys()[0], is_dir=True, path='/')
+        self.add_recursive(root, structure.values()[0])
+
+        root.sortAll()
+
+        canvas = ohmu.Canvas(width, height)
+        canvas.draw(root)
+
+        self.assertEqual(
+            canvas.get_string(),
+            coffee_string(str),
+        )
+
+    def add_recursive(self, parent, structure):
+        for key, value in structure.items():
+            if isinstance(value, int):
+                parent.add_child(ohmu.File(key, size=value))
+            else:
+                dir = ohmu.File(key, is_dir=True)
+                parent.add_child(dir)
+                self.add_recursive(dir, value)
 
 
 class Utils(TestCase):
