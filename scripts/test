@@ -11,7 +11,7 @@ main() {
   [[ -d qa_reports ]] || mkdir qa_reports
 
   find . -name '*.pyc' -delete
-  python -m compileall -x jinja2 -q .
+  python -m compileall -x jinja2 -q ohmu
 
   if [[ "$1" ]]; then
     [[ -e env/bin/activate ]] || subcommand_install
@@ -37,6 +37,7 @@ subcommand_install() {
       'coverage==3.7.1' \
       'flake8==2.4.1' \
       'green==1.11.0' \
+      'nose==1.3.7' \
       'pudb==2015.3'
   python setup.py test
 }
@@ -52,13 +53,15 @@ subcommand_lint() {
     --max-complexity 7
     --exclude=.ropeproject
   )
-  flake8 "${args[@]}" ohmu.py > qa_reports/flake8 || true
+  flake8 "${args[@]}" ohmu > qa_reports/flake8 || true
+  echo -n "$(tput setaf 1)"
   cat qa_reports/flake8
+  echo -n "$(tput sgr0)"
 }
 
 subcommand_cover() {
-  green test.py -vv
-  coverage run --source=ohmu test.py
+  green ohmu/test_*.py -vv
+  nosetests --with-coverage --cover-erase --cover-package=ohmu
   coverage -rm
   coverage xml -o qa_reports/coverage.xml
   rm -f .coverage
