@@ -122,18 +122,55 @@ class Canvas(TestCase):
         }, r"""
             /a---------------------------------------\
             |/e---------------------\/dd-----\/bb---\|
-            ||/k-------\/h\/j---\/i\||/g----\||     ||
-            |||/l-----\|| ||    || ||||     |||     ||
-            ||||      ||| ||    || ||||     |||     ||
-            ||||      ||| ||    || ||||     ||\-----/|
-            ||||      ||| ||    || ||||     ||/c----\|
-            ||||      ||| ||    || |||\-----/||     ||
-            |||\------/|| ||    || |||/f----\||     ||
-            ||\--------/\-/\----/\-/||\-----/||     ||
+            ||/k-------\/j--\/i----\||/g----\||     ||
+            |||/l-----\||   ||     ||||     |||     ||
+            ||||      |||   ||     ||||     |||     ||
+            ||||      |||   ||     ||||     ||\-----/|
+            ||||      |||   |\-----/|||     ||/c----\|
+            ||||      |||   |/h----\||\-----/||     ||
+            |||\------/||   ||     |||/f----\||     ||
+            ||\--------/\---/\-----/||\-----/||     ||
             |\----------------------/\-------/\-----/|
             \----------------------------------------/
         """
         )
+
+    def test_split_in_two_one_element(self):
+        with self.assertRaises(AssertionError):
+            views.Canvas.split_in_two([1])
+
+    def test_split_in_two_two_elements(self):
+        self.check_split(
+            [('a', 2), ('b', 2)],
+            [['a'], ['b']],
+        )
+
+    def test_split_in_two_three_elements(self):
+        self.check_split(
+            [('a', 3), ('b', 2), ('c', 1)],
+            [['a'], ['b', 'c']],
+        )
+
+    def test_split_in_two_first_list_is_bigger(self):
+        self.check_split(
+            [('a', 2), ('b', 2), ('c', 1)],
+            [['a', 'b'], ['c']],
+        )
+
+    def test_split_in_two_equal_sizes(self):
+        self.check_split(
+            [('a', 1), ('b', 1), ('c', 1), ('d', 1), ('e', 1)],
+            [['a', 'b', 'c'], ['d', 'e']],
+        )
+
+    def check_split(self, files, split_names):
+        files = [
+            fs.File(name, size=size, path='/')
+            for name, size in files
+        ]
+        split = views.Canvas.split_in_two(files)
+        real_names = [[x.name for x in list] for list in split[0]]
+        self.assertEqual(real_names, split_names)
 
     def with_size(self, width, height, str):
         canvas = views.Canvas(width, height)

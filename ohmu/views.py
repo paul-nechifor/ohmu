@@ -87,18 +87,8 @@ class Canvas(object):
         if len(children) == 1:
             self.draw_object(children[0], l, sx, tx, sy, ty)
             return
-        lists = [[], []]
-        sizes = [0, 0]
-        i = 0
-        for child in children:
-            lists[i].append(child)
-            sizes[i] += child.size
-            i = int(sizes[0] > sizes[1])
 
-        # The first list has to be the largest.
-        if sizes[0] < sizes[1]:
-            sizes = sizes[::-1]
-            lists = lists[::-1]
+        lists, sizes = self.split_in_two(children)
 
         dx = tx - sx + 1
         dy = ty - sy + 1
@@ -132,6 +122,37 @@ class Canvas(object):
 
     def get_string(self):
         return '\n'.join(''.join(y[0] for y in x) for x in self.table)
+
+    @classmethod
+    def split_in_two(cls, files):
+        assert len(files) >= 2
+
+        list_l, list_r = [files[0]], [files[-1]]
+        size_l, size_r = files[0].size, files[-1].size
+        index_l, index_r = 1, len(files) - 2
+
+        while index_l <= index_r:
+            if size_l < size_r:
+                list_l.append(files[index_l])
+                size_l += files[index_l].size
+                index_l += 1
+            else:
+                list_r.append(files[index_r])
+                size_r += files[index_r].size
+                index_r -= 1
+
+        # Make sure the first list is always the largest.
+        if size_l < size_r:
+            # Move one element.
+            file = list_r.pop()
+            size_r -= file.size
+            list_l.append(file)
+            size_l += file.size
+
+        # Reverse since it's in the wrong order.
+        list_r = list(reversed(list_r))
+
+        return [list_l, list_r], [size_l, size_r]
 
 
 class Screen(object):
