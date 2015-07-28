@@ -50,9 +50,7 @@ class Scanner(TestCase):
             },
         }
         with self.file_structure(structure) as dir:
-            scanner = fs.Scanner(join(dir, 'd1'))
-            scanner.start()
-            scanner.join()
+            scanner = self.get_scan(join(dir, 'd1'))
 
         root = scanner.root
         self.equalities(
@@ -61,18 +59,53 @@ class Scanner(TestCase):
             root.parent, None,
             root.size, 19,
         )
-        root.sortAll()
         self.equalities(
             [(x.name, x.size) for x in root.children],
             [('a', 10), ('b', 5), ('d2', 4)],
         )
 
+    def test_fobidden_files_are_ignores(self):
+        structure = {
+            'd1': {
+                'a': '-' * 10,
+                'd2': {
+                    'b': '-' * 5,
+                },
+            },
+        }
+
+        def post_creation(dir):
+            os.chmod(join(dir, 'd1', 'd2'), 0)
+
+        def pre_deletion(dir):
+            os.chmod(join(dir, 'd1', 'd2'), 0o777)
+
+        with self.file_structure(structure, post_creation, pre_deletion) as d:
+            scanner = self.get_scan(join(d, 'd1'))
+
+        self.equalities(
+            [x.name for x in scanner.root.children], ['a', 'd2'],
+            scanner.root.size, 10,
+            scanner.root.children[1].size, 0,
+        )
+
     @contextmanager
-    def file_structure(self, structure):
+    def file_structure(self, structure, post_creation=None, pre_deletion=None):
         dir = mkdtemp()
         self.create_file_structure(structure, dir)
+        if post_creation is not None:
+            post_creation(dir)
         yield dir
+        if pre_deletion is not None:
+            pre_deletion(dir)
         shutil.rmtree(dir)
+
+    def get_scan(self, dir):
+        scanner = fs.Scanner(dir)
+        scanner.start()
+        scanner.join()
+        scanner.root.sortAll()
+        return scanner
 
     def create_file_structure(self, structure, dir):
         for name, value in structure.items():

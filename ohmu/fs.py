@@ -45,15 +45,20 @@ class Scanner(Thread):
     def scan(self, parent):
         dirs = []
         with self.lock:
-            for f in os.listdir(parent.path):
-                path = join(parent.path, f)
-                stat = os.stat(path)
-                mode = stat.st_mode
-                if S_ISDIR(mode):
-                    dir = File(f, is_dir=True)
-                    parent.add_child(dir)
-                    dirs.append(dir)
-                elif S_ISREG(mode):
-                    parent.add_child(File(f, size=stat.st_size))
+            try:
+                dir_list = os.listdir(parent.path)
+            except OSError:
+                pass
+            else:
+                for f in dir_list:
+                    path = join(parent.path, f)
+                    stat = os.stat(path)
+                    mode = stat.st_mode
+                    if S_ISDIR(mode):
+                        dir = File(f, is_dir=True)
+                        parent.add_child(dir)
+                        dirs.append(dir)
+                    elif S_ISREG(mode):
+                        parent.add_child(File(f, size=stat.st_size))
         for dir in dirs:
             self.scan(dir)
