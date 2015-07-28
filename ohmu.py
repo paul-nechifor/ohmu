@@ -207,21 +207,28 @@ class Canvas(object):
 
 
 class Screen(object):
+    ESC_KEY = 27
 
     def __init__(self):
+        self.height = -1
+        self.width = -1
+
+        # Use a short delay for sending the Escape key (but don't override it
+        # if it's set).
+        if 'ESCDELAY' not in os.environ:
+            os.environ['ESCDELAY'] = '10'
+
         self.screen = curses.initscr()
         curses.start_color()
         curses.use_default_colors()
         for i in range(0, min(curses.COLORS, 8)):
             curses.init_pair(i + 1, 15, i)
-        self.height = -1
-        self.width = -1
 
     def start(self):
         curses.noecho()
         curses.cbreak()
-        self.screen.keypad(1)
-        self.screen.nodelay(1)
+        self.screen.keypad(True)
+        self.screen.nodelay(True)
         self.update_size()
 
     def tick(self, tick, scanner):
@@ -238,6 +245,17 @@ class Screen(object):
 
     def update_size(self):
         self.height, self.width = self.screen.getmaxyx()
+
+    def get_key_sequence(self):
+        """Returns a key, or key sequence."""
+        key = self.screen.getch()
+        if key == self.ESC_KEY:  # Escape or Alt.
+            self.screen.nodelay(True)
+            key2 = self.screen.getch()
+            if key2 == -1:
+                return key  # Escape.
+            return (key, key2)  # Alt.
+        return key
 
     def stop(self):
         self.screen.keypad(0)
@@ -272,7 +290,7 @@ class Ohmu(object):
         last_tick = start
         self.screen.tick(start, self.scanner)
         while self.keep_running:
-            self.process_input(self.screen.screen.getch())
+            self.process_input(self.screen.get_key_sequence())
             if not self.keep_running:
                 break
             now = time.time()
@@ -281,8 +299,8 @@ class Ohmu(object):
                 last_tick = now
                 self.screen.tick(now, self.scanner)
 
-    def process_input(self, key):
-        if key == ord('q'):
+    def process_input(self, key_sequence):
+        if key_sequence in (ord('q'), Screen.ESC_KEY):
             self.keep_running = False
 
 
