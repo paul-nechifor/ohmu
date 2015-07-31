@@ -46,9 +46,19 @@ class Scanner(Thread):
         self.daemon = True
         path = abspath(root_path)
         self.root = File(basename(path), is_dir=True, path=path)
+        self.exception = None
 
     def run(self):
-        self.scan(self.root)
+        try:
+            self.scan(self.root)
+        except BaseException as e:
+            self.exception = e
+            raise
+
+    def join(self):
+        super(Scanner, self).join()
+        if self.exception is not None:
+            raise Exception(self.exception)
 
     def scan(self, parent):
         dirs = []
@@ -60,7 +70,10 @@ class Scanner(Thread):
             else:
                 for f in dir_list:
                     path = join(parent.path, f)
-                    stat = os.stat(path)
+                    try:
+                        stat = os.stat(path)
+                    except OSError:
+                        continue
                     mode = stat.st_mode
                     if S_ISDIR(mode):
                         dir = File(f, is_dir=True)

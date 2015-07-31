@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from mock import patch
 from os.path import join
 from tempfile import mkdtemp
 import os
@@ -87,6 +88,33 @@ class Scanner(TestCase):
             [x.name for x in scanner.root.children], ['a', 'd2'],
             scanner.root.size, 10,
             scanner.root.children[1].size, 0,
+        )
+
+    def test_deleted_files_are_ignores(self):
+        structure = {
+            'd1': {
+                'a': '-' * 10,
+                'b': '-' * 10,
+            },
+        }
+
+        with self.file_structure(structure) as d:
+            real_listdir = os.listdir
+
+            with patch.object(fs.os, 'listdir') as listdir:
+
+                def listdir_func(*args, **kwargs):
+                    ret = real_listdir(*args, **kwargs)
+                    os.remove(join(d, 'd1', 'b'))
+                    return ret
+
+                listdir.side_effect = listdir_func
+
+                scanner = self.get_scan(join(d, 'd1'))
+
+        self.equalities(
+            [x.name for x in scanner.root.children], ['a'],
+            scanner.root.size, 10,
         )
 
     @contextmanager
