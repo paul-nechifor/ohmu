@@ -106,7 +106,7 @@ class Canvas(object):
                     sx + dx2, tx,
                     sy, ty,
                 )
-        if dx < dy:
+        else:
             dy2 = int(math.ceil(dy * ratio))
             self.draw_children(
                 lists[0], l,

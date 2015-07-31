@@ -59,6 +59,10 @@ subcommand_lint() {
   echo -n "$(tput sgr0)"
 }
 
+subcommand_unit() {
+  nosetests -s # You need `-s` for PuDB to work.
+}
+
 subcommand_cover() {
   green ohmu/test_*.py -vv
   nosetests --with-coverage --cover-erase --cover-package=ohmu
