@@ -22,9 +22,10 @@ class Canvas(object):
         t = self.table
         name = object.name
 
+        color = 1 + l % 6 if object.is_dir else 0
         for x in xrange(dx):
             for y in xrange(dy):
-                t[sy + y][sx + x][1] = 1 + l % 7
+                t[sy + y][sx + x][1] = color
 
         if dx == 1 and dy == 1:
             t[sy][sx][0] = '*'
@@ -171,8 +172,8 @@ class Screen(object):
         self.screen = curses.initscr()
         curses.start_color()
         curses.use_default_colors()
-        for i in range(0, min(curses.COLORS, 8)):
-            curses.init_pair(i + 1, 15, i)
+        for i, color in enumerate([0, 1, 2, 3, 6, 4, 5]):
+            curses.init_pair(i + 1, 15, color)
 
     def start(self):
         curses.noecho()
@@ -190,7 +191,7 @@ class Screen(object):
 
         for i, line in enumerate(canvas.table):
             for j, [char, color] in enumerate(line):
-                self.screen.insch(i, j, char, curses.color_pair(color))
+                self.screen.insch(i, j, char, curses.color_pair(1 + color))
 
         self.screen.refresh()
 
