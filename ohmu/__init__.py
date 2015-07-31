@@ -18,9 +18,9 @@ class Ohmu(object):
         self.keep_running = True
 
     def start(self):
-        self.scanner.start()
-        self.screen.start()
         try:
+            self.scanner.start()
+            self.screen.start()
             self.loop()
         except KeyboardInterrupt:
             pass

@@ -163,6 +163,7 @@ class Screen(object):
     def __init__(self):
         self.height = -1
         self.width = -1
+        self.started = False
 
         # Use a short delay for sending the Escape key (but don't override it
         # if it's set).
@@ -176,6 +177,7 @@ class Screen(object):
             curses.init_pair(i + 1, 15, color)
 
     def start(self):
+        self.started = True
         curses.noecho()
         curses.cbreak()
         curses.curs_set(False)
@@ -210,6 +212,8 @@ class Screen(object):
         return key
 
     def stop(self):
+        if not self.started:
+            return
         self.screen.keypad(0)
         curses.curs_set(True)
         curses.nocbreak()
