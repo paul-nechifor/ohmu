@@ -29,6 +29,14 @@ class File(object):
         for x in self.children:
             x.sortAll()
 
+    @property
+    def draw_size(self):
+        """
+        For drawing purposes, all files should have at least a size of 1 so
+        that they are visible.
+        """
+        return self.size if self.size >= 1 else 1
+
 
 class Scanner(Thread):
 

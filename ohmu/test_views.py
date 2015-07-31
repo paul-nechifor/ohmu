@@ -105,6 +105,19 @@ class Canvas(TestCase):
         """
         )
 
+    def test_zero_sized_files(self):
+        self.with_nested(4, 3, {
+            'a': {
+                'b': 0,
+                'c': 0,
+            }
+        }, r"""
+            /a-\
+            |**|
+            \--/
+        """
+        )
+
     def test_two_files(self):
         self.with_nested(12, 5, {
             'a': {'bb': 5, 'c': 5}

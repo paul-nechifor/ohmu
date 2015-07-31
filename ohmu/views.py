@@ -128,26 +128,26 @@ class Canvas(object):
         assert len(files) >= 2
 
         list_l, list_r = [files[0]], [files[-1]]
-        size_l, size_r = files[0].size, files[-1].size
+        size_l, size_r = files[0].draw_size, files[-1].draw_size
         index_l, index_r = 1, len(files) - 2
 
         while index_l <= index_r:
             if size_l < size_r:
                 list_l.append(files[index_l])
-                size_l += files[index_l].size
+                size_l += files[index_l].draw_size
                 index_l += 1
             else:
                 list_r.append(files[index_r])
-                size_r += files[index_r].size
+                size_r += files[index_r].draw_size
                 index_r -= 1
 
         # Make sure the first list is always the largest.
         if size_l < size_r:
             # Move one element.
             file = list_r.pop()
-            size_r -= file.size
+            size_r -= file.draw_size
             list_l.append(file)
-            size_l += file.size
+            size_l += file.draw_size
 
         # Reverse since it's in the wrong order.
         list_r = list(reversed(list_r))
