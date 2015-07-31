@@ -177,6 +177,7 @@ class Screen(object):
     def start(self):
         curses.noecho()
         curses.cbreak()
+        curses.curs_set(False)
         self.screen.keypad(True)
         self.screen.nodelay(True)
         self.update_size()
@@ -187,9 +188,9 @@ class Screen(object):
             scanner.root.sortAll()
             canvas.draw(scanner.root)
 
-        for i, line in enumerate(canvas.table[:-1]):
+        for i, line in enumerate(canvas.table):
             for j, [char, color] in enumerate(line):
-                self.screen.addch(i, j, char, curses.color_pair(color))
+                self.screen.insch(i, j, char, curses.color_pair(color))
 
         self.screen.refresh()
 
@@ -209,6 +210,7 @@ class Screen(object):
 
     def stop(self):
         self.screen.keypad(0)
+        curses.curs_set(True)
         curses.nocbreak()
         curses.echo()
         curses.endwin()
