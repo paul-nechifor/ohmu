@@ -1,4 +1,5 @@
 *.egg-info
+.coverage
 .eggs/
 /build
 /dist
