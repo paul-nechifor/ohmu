@@ -1,6 +1,6 @@
 from mock import patch
 
-from . import main, sys, entry_point
+from . import entry_point, main, sys
 from .utils import TestCase
 
 

@@ -1,7 +1,7 @@
+import os
 from os.path import abspath, basename, join
 from stat import S_ISDIR, S_ISREG
-from threading import Thread, RLock
-import os
+from threading import RLock, Thread
 
 
 class File(object):

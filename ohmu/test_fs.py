@@ -1,9 +1,10 @@
-from contextlib import contextmanager
-from mock import patch
-from os.path import join
-from tempfile import mkdtemp
 import os
 import shutil
+from contextlib import contextmanager
+from os.path import join
+from tempfile import mkdtemp
+
+from mock import patch
 
 from . import fs
 from .utils import TestCase
