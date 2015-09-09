@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
+from os.path import abspath
 import sys
 import time
-from os.path import abspath
 
 from .views import Screen
 from .fs import Scanner
@@ -51,7 +51,6 @@ class Ohmu(object):
 def main(name, args):
     if name != '__main__':
         return
-
     root_path = abspath(args[0] if args else '.')
     Ohmu(root_path).start()
 

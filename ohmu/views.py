@@ -170,13 +170,13 @@ class Screen(object):
         if 'ESCDELAY' not in os.environ:
             os.environ['ESCDELAY'] = '10'
 
+    def start(self):
         self.screen = curses.initscr()
         curses.start_color()
         curses.use_default_colors()
         for i, color in enumerate([0, 1, 2, 3, 6, 4, 5]):
             curses.init_pair(i + 1, 15, color)
 
-    def start(self):
         self.started = True
         curses.noecho()
         curses.cbreak()
