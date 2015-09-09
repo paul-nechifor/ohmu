@@ -1,6 +1,6 @@
-from mock import patch
+from mock import Mock, patch
 
-from . import entry_point, main, sys
+from . import Ohmu, entry_point, main, sys
 from .utils import TestCase
 
 
@@ -23,3 +23,42 @@ class Main(TestCase):
         with patch.object(sys, 'argv', ['-', '/some/dir']):
             entry_point()
         main.assert_called_with('__main__', ['/some/dir'])
+
+
+class OhmuTest(TestCase):
+    def test_exits_when_loop_exits(self):
+        o = self.get_mocked_ohmu_instance()
+        o.loop = Mock()
+        o.start()
+        o.screen.stop.assert_called_with()
+
+    def test_exits_when_ctrl_c_is_pressed(self):
+        o = self.get_mocked_ohmu_instance()
+        o.loop = Mock(side_effect=KeyboardInterrupt)
+        o.start()
+        o.screen.stop.assert_called_with()
+
+    def test_stop_on_exceptions_and_rethrow(self):
+        o = self.get_mocked_ohmu_instance()
+        o.loop = Mock(side_effect=Exception('Nucular Exception'))
+        with self.assertRaisesRegexp(Exception, 'Nucular Exception'):
+            o.start()
+        o.screen.stop.assert_called_with()
+
+    def test_loop_stops_on_q(self):
+        o = self.get_mocked_ohmu_instance()
+        o.process_input(ord('q'))
+        self.assertFalse(o.keep_running)
+
+    def test_loop_can_be_stopped_by_process_input(self):
+        o = self.get_mocked_ohmu_instance()
+        o.screen.get_key_sequence = Mock(return_value=ord('q'))
+        o.loop()
+        self.assertFalse(o.keep_running)
+        self.assertEqual(o.screen.tick.call_count, 1)
+
+    def get_mocked_ohmu_instance(self):
+        o = Ohmu('/tmp')
+        o.scanner = Mock()
+        o.screen = Mock()
+        return o
