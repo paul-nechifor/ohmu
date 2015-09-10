@@ -91,7 +91,7 @@ class Scanner(TestCase):
             scanner.root.children[1].size, 0,
         )
 
-    def test_deleted_files_are_ignores(self):
+    def test_deleted_files_are_ignored(self):
         structure = {
             'd1': {
                 'a': '-' * 10,
@@ -112,6 +112,20 @@ class Scanner(TestCase):
                 listdir.side_effect = listdir_func
 
                 scanner = self.get_scan(join(d, 'd1'))
+
+        self.equalities(
+            [x.name for x in scanner.root.children], ['a'],
+            scanner.root.size, 10,
+        )
+
+    def test_symlinks_are_ignored(self):
+        structure = {'d1': {'a': '-' * 10}}
+
+        def post_creation(dir):
+            os.symlink(dir + '/d1/a', dir + '/d1/b')
+
+        with self.file_structure(structure, post_creation) as d:
+            scanner = self.get_scan(join(d, 'd1'))
 
         self.equalities(
             [x.name for x in scanner.root.children], ['a'],

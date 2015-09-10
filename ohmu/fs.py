@@ -70,6 +70,8 @@ class Scanner(Thread):
             else:
                 for f in dir_list:
                     path = join(parent.path, f)
+                    if os.path.islink(path):
+                        continue
                     try:
                         stat = os.stat(path)
                     except OSError:
