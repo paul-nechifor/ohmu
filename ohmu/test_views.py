@@ -1,3 +1,5 @@
+from mock import Mock, patch
+
 from . import fs, views
 from .utils import TestCase, coffee_string
 
@@ -232,3 +234,48 @@ class Canvas(TestCase):
                 dir = fs.File(key, is_dir=True)
                 parent.add_child(dir)
                 self.add_recursive(dir, value)
+
+
+class Screen(TestCase):
+    @patch('ohmu.views.curses')
+    def test_start(self, curses):
+        s = views.Screen()
+        screen = Mock()
+        screen.getmaxyx = Mock(return_value=(20, 10))
+        curses.initscr.return_value = screen
+        s.start()
+        self.assertEqual((s.width, s.height), (10, 20))
+
+    @patch('ohmu.views.curses')
+    def test_stop(self, curses):
+        s = views.Screen()
+        s.started = True
+        s.screen = Mock()
+        s.stop()
+        curses.endwin.assert_called_with()
+
+    @patch('ohmu.views.curses')
+    def test_stop_is_no_op_is_not_started(self, curses):
+        s = views.Screen()
+        s.stop()
+        self.assertEqual(0, curses.endwin.call_count)
+
+    def test_escape_returns_escape(self):
+        self.assert_screen_returns(
+            [views.Screen.ESC_KEY, -1], views.Screen.ESC_KEY,
+        )
+
+    def test_alt_t_returns_alt_t(self):
+        self.assert_screen_returns(
+            [views.Screen.ESC_KEY, ord('t')],
+            (views.Screen.ESC_KEY, ord('t')),
+        )
+
+    def test_q_returns_q(self):
+        self.assert_screen_returns([ord('q')], ord('q'))
+
+    def assert_screen_returns(self, sequence, ret):
+        screen = views.Screen()
+        screen.screen = Mock()
+        screen.screen.getch.side_effect = sequence
+        self.assertEqual(ret, screen.get_key_sequence())

@@ -164,11 +164,11 @@ class Screen(object):
         self.height = -1
         self.width = -1
         self.started = False
+        self.screen = None
 
         # Use a short delay for sending the Escape key (but don't override it
         # if it's set).
-        if 'ESCDELAY' not in os.environ:
-            os.environ['ESCDELAY'] = '10'
+        os.environ.setdefault('ESCDELAY', '10')
 
     def start(self):
         self.screen = curses.initscr()

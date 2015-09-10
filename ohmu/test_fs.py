@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from os.path import join
 from tempfile import mkdtemp
 
-from mock import patch
+from mock import Mock, patch
 
 from . import fs
 from .utils import TestCase
@@ -117,6 +117,13 @@ class Scanner(TestCase):
             [x.name for x in scanner.root.children], ['a'],
             scanner.root.size, 10,
         )
+
+    def test_scanning_error_is_raised_on_join(self):
+        scanner = fs.Scanner('/bad/dir')
+        scanner.scan = Mock(side_effect=Exception('The fuck is that'))
+        scanner.start()
+        with self.assertRaisesRegexp(Exception, 'The fuck is that'):
+            scanner.join()
 
     @contextmanager
     def file_structure(self, structure, post_creation=None, pre_deletion=None):
