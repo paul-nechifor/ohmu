@@ -1,8 +1,18 @@
-import re
 from unittest import TestCase as BaseTestCase
+import re
+import curses
 
 
 class TestCase(BaseTestCase):
+
+    def setUp(self):
+        super(TestCase, self).setUp()
+        curses.ACS_ULCORNER = '/'
+        curses.ACS_URCORNER = '\\'
+        curses.ACS_LLCORNER = '\\'
+        curses.ACS_LRCORNER = '/'
+        curses.ACS_HLINE = '-'
+        curses.ACS_VLINE = '|'
 
     def equalities(self, *args):
         for a, b in zip(*(iter(args),) * 2):

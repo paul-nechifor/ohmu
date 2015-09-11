@@ -1,3 +1,4 @@
+from itertools import chain, repeat
 import curses
 import math
 import os
@@ -43,10 +44,10 @@ class Canvas(object):
             self.fill_horizontal_name(name, t, sx + 1, sy, dx - 2)
             return
 
-        t[sy][sx][0] = '/'
-        t[sy][tx][0] = '\\'
-        t[ty][sx][0] = '\\'
-        t[ty][tx][0] = '/'
+        t[sy][sx][0] = curses.ACS_ULCORNER
+        t[sy][tx][0] = curses.ACS_URCORNER
+        t[ty][sx][0] = curses.ACS_LLCORNER
+        t[ty][tx][0] = curses.ACS_LRCORNER
 
         if dx == 2 and dy > 2:
             t[sy + 1][sx][0] = name[0]
@@ -68,20 +69,18 @@ class Canvas(object):
 
     def fill_vertical(self, t, sx, sy, ny):
         for i in xrange(ny):
-            t[sy + i][sx][0] = '|'
+            t[sy + i][sx][0] = curses.ACS_VLINE
 
     def fill_horizontal(self, t, sx, sy, nx):
         for i in xrange(nx):
-            t[sy][sx + i][0] = '-'
+            t[sy][sx + i][0] = curses.ACS_HLINE
 
     def fill_horizontal_name(self, name, t, sx, sy, nx):
         if nx <= 0:
             return
         name = name[:nx]
         left = nx - len(name)
-        if left > 0:
-            name += '-' * left
-        for i, c in enumerate(name):
+        for i, c in enumerate(chain(name, repeat(curses.ACS_HLINE, left))):
             t[sy][sx + i][0] = c
 
     def draw_children(self, children, l, sx, tx, sy, ty):  # noqa
