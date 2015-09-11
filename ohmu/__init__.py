@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 from os.path import abspath
+import curses
 import sys
 import time
 
-from .views import Screen
 from .fs import Scanner
+from .views import Screen
 
 
 class Ohmu(object):
@@ -46,6 +47,8 @@ class Ohmu(object):
     def process_input(self, key_sequence):
         if key_sequence in (ord('q'), Screen.ESC_KEY):
             self.keep_running = False
+        elif key_sequence == curses.KEY_RESIZE:
+            self.screen.update_size()
 
 
 def main(name, args):

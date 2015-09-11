@@ -1,4 +1,5 @@
 from mock import Mock, patch
+import curses
 
 from . import Ohmu, entry_point, main, sys
 from .utils import TestCase
@@ -56,6 +57,11 @@ class OhmuTest(TestCase):
         o.loop()
         self.assertFalse(o.keep_running)
         self.assertEqual(o.screen.tick.call_count, 1)
+
+    def test_changing_the_screen_size_triggers_update(self):
+        o = self.get_mocked_ohmu_instance()
+        o.process_input(curses.KEY_RESIZE)
+        o.screen.update_size.assert_called_with()
 
     def get_mocked_ohmu_instance(self):
         o = Ohmu('/tmp')
