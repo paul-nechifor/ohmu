@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ohmu',
-    version='0.3.0',
+    version='0.3.1',
     author='Paul Nechifor',
     author_email='paul@nechifor.net',
     description='View space usage in your terminal.',
