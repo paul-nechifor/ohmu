@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='ohmu',
@@ -6,7 +6,7 @@ setup(
     author='Paul Nechifor',
     author_email='paul@nechifor.net',
     description='View space usage in your terminal.',
-    py_modules=['ohmu'],
+    packages=find_packages(),
     keywords='space usage',
     long_description=open('readme.rst').read(),
     entry_points={'console_scripts': ['ohmu=ohmu:entry_point']},
