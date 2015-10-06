@@ -44,7 +44,7 @@ subcommand_install() {
 }
 
 subcommand_clean() {
-  rm -fr env ohmu.egg-info ./*.egg dist qa_reports
+  rm -fr env build ohmu.egg-info ./*.egg dist qa_reports
   find . -name '*.pyc' -delete
 }
 

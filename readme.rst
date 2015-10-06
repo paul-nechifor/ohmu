@@ -3,6 +3,33 @@ Ohmu
 
 View space usage in your terminal.
 
+Usage
+-----
+
+Install::
+
+    sudo pip install ohmu --upgrade
+
+Scan the current directory::
+
+    ohmu
+
+Scan some random directory::
+
+    ohmu some/random/dir
+
+Tests
+-----
+
+Run::
+
+    ./scripts/test cover
+
+License
+-------
+
+MIT
+
 .. image:: https://img.shields.io/travis/paul-nechifor/ohmu.svg?style=flat-square
     :target: https://travis-ci.org/paul-nechifor/ohmu
 
