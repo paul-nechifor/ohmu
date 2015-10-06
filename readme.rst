@@ -3,6 +3,8 @@ Ohmu
 
 View space usage in your terminal.
 
+.. image:: animation.gif
+
 Usage
 -----
 
