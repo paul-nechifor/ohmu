@@ -177,7 +177,7 @@ class Screen(object):
         curses.start_color()
         curses.use_default_colors()
         for i, color in enumerate([0, 1, 2, 3, 6, 4, 5]):
-            curses.init_pair(i + 1, 15, color)
+            curses.init_pair(i + 1, curses.COLOR_WHITE, color)
 
         self.started = True
         curses.noecho()
@@ -195,7 +195,7 @@ class Screen(object):
 
         for i, line in enumerate(canvas.table):
             for j, [char, color] in enumerate(line):
-                self.screen.insch(i, j, char, curses.color_pair(1 + color))
+                self.screen.insch(i, j, char, curses.color_pair(1 + color) | curses.A_BOLD)
 
         self.screen.refresh()
 
