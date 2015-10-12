@@ -2,7 +2,10 @@ from itertools import chain, repeat
 import curses
 import math
 import os
+import sys
 
+if sys.version_info.major == 3:
+    xrange = range
 
 class Canvas(object):
 
