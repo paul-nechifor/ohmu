@@ -1,3 +1,5 @@
+import sys
+
 from mock import Mock, patch
 
 from . import fs, views
@@ -213,8 +215,13 @@ class Canvas(TestCase):
         a.add_child(fs.File('b', size=5))
 
         self.assertEqual(len(structure), 1)
-        root = fs.File(structure.keys()[0], is_dir=True, path='/')
-        self.add_recursive(root, structure.values()[0])
+        if sys.version_info.major == 3:
+            # In Python 3 <dict>.keys() does not return a list but <dict_keys>
+            root = fs.File(list(structure.keys())[0], is_dir=True, path='/')
+            self.add_recursive(root, list(structure.values())[0])
+        else:
+            root = fs.File(structure.keys()[0], is_dir=True, path='/')
+            self.add_recursive(root, structure.values()[0])
 
         root.sortAll()
 
