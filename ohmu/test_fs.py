@@ -3,12 +3,15 @@ import shutil
 from contextlib import contextmanager
 from os.path import join
 from tempfile import mkdtemp
+import sys
 
 from mock import Mock, patch
 
 from . import fs
 from .utils import TestCase
 
+if sys.version_info.major == 3:
+    basestring = str
 
 class File(TestCase):
 

@@ -1,7 +1,10 @@
 from unittest import TestCase as BaseTestCase
 import re
 import curses
+import sys
 
+if sys.version_info.major == 3:
+    basestring = str
 
 class TestCase(BaseTestCase):
 
