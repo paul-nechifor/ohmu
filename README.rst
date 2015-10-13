@@ -23,9 +23,9 @@ View space usage in your terminal.
 Usage
 -----
 
-Install::
+Install (prefix with `sudo` if you need to)::
 
-    sudo pip install ohmu --upgrade
+    pip install ohmu --upgrade
 
 Scan the current directory::
 
