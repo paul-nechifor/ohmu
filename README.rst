@@ -23,7 +23,7 @@ View space usage in your terminal.
 Usage
 -----
 
-Install (prefix with `sudo` if you need to)::
+Install (prefix with ``sudo`` if you need to)::
 
     pip install ohmu --upgrade
 
