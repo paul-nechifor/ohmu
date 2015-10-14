@@ -10,8 +10,8 @@ from mock import Mock, patch
 from . import fs
 from .utils import TestCase
 
-if sys.version_info.major == 3:
-    basestring = str
+basestring = str if sys.version_info[0] == 3 else basestring
+
 
 class File(TestCase):
 

@@ -1,4 +1,4 @@
-from .utils import TestCase, coffee_string
+from .utils import TestCase, coffee_string, format_size
 
 
 class Utils(TestCase):
@@ -43,3 +43,10 @@ class Utils(TestCase):
         ])
         with self.assertRaisesRegexp(AssertionError, string):
             self.assertEqual('good', 'bad')
+
+    def test_format_size(self):
+        self.assertEqual(format_size(10, '%d'), '10B')
+        self.assertEqual(format_size(1024, '%.2f'), '1.00K')
+        self.assertEqual(format_size(1025, '%d'), '1K')
+        self.assertEqual(format_size(1024 * 1024, '%d'), '1M')
+        self.assertEqual(format_size(3 * 1024 ** 4, '%d'), '3T')

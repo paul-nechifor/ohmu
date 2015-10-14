@@ -4,8 +4,8 @@ import math
 import os
 import sys
 
-if sys.version_info[0] == 3:
-    xrange = range
+xrange = range if sys.version_info[0] == 3 else xrange
+
 
 class Canvas(object):
 
@@ -44,7 +44,9 @@ class Canvas(object):
         elif dy == 1:
             t[sy][sx][0] = '<'
             t[sy][tx][0] = '>'
-            self.fill_horizontal_name(name, t, sx + 1, sy, dx - 2)
+            self.fill_horizontal_name(
+                object.get_name_size(dx - 2), t, sx + 1, sy, dx - 2
+            )
             return
 
         t[sy][sx][0] = curses.ACS_ULCORNER
@@ -57,7 +59,9 @@ class Canvas(object):
             self.fill_horizontal(t, sx + 1, sy, dx - 2)
             self.fill_vertical(t, sx, sy + 2, dy - 3)
         else:
-            self.fill_horizontal_name(name, t, sx + 1, sy, dx - 2)
+            self.fill_horizontal_name(
+                object.get_name_size(dx - 2), t, sx + 1, sy, dx - 2
+            )
             self.fill_vertical(t, sx, sy + 1, dy - 2)
 
         self.fill_horizontal(t, sx + 1, ty, dx - 2)
@@ -81,7 +85,6 @@ class Canvas(object):
     def fill_horizontal_name(self, name, t, sx, sy, nx):
         if nx <= 0:
             return
-        name = name[:nx]
         left = nx - len(name)
         for i, c in enumerate(chain(name, repeat(curses.ACS_HLINE, left))):
             t[sy][sx + i][0] = c
@@ -195,7 +198,9 @@ class Screen(object):
 
         for i, line in enumerate(canvas.table):
             for j, [char, color] in enumerate(line):
-                self.screen.insch(i, j, char, curses.color_pair(1 + color) | curses.A_BOLD)
+                self.screen.insch(
+                    i, j, char, curses.color_pair(1 + color) | curses.A_BOLD
+                )
 
         self.screen.refresh()
 

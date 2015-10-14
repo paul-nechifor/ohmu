@@ -3,6 +3,8 @@ from os.path import abspath, basename, join
 from stat import S_ISDIR, S_ISREG
 from threading import RLock, Thread
 
+from .utils import format_size
+
 
 class File(object):
 
@@ -28,6 +30,18 @@ class File(object):
         self.children.sort(key=lambda x: (-x.size, x.name))
         for x in self.children:
             x.sortAll()
+
+    def get_name_size(self, max_size):
+        if len(self.name) >= max_size:
+            return self.name[:max_size]
+        # I'm avoiding complex calculations by just trying two different sizes.
+        try1 = '%s %s' % (self.name, format_size(self.size, '%.2f'))
+        if len(try1) <= max_size:
+            return try1
+        try2 = '%s %s' % (self.name, format_size(self.size, '%d'))
+        if len(try2) <= max_size:
+            return try2
+        return self.name
 
     @property
     def draw_size(self):

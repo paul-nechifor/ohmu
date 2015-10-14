@@ -3,8 +3,8 @@ import re
 import curses
 import sys
 
-if sys.version_info.major == 3:
-    basestring = str
+basestring = str if sys.version_info[0] == 3 else basestring
+
 
 class TestCase(BaseTestCase):
 
@@ -62,3 +62,12 @@ def coffee_string(string):
 
     regex = re.compile(r'^ {,%s}' % min_spaces)
     return '\n'.join(map(lambda x: regex.sub('', x), lines))
+
+
+def format_size(num, format='%.2f'):
+    format += '%s'
+    for unit in ['B', 'K', 'M', 'G']:
+        if abs(num) < 1024.0:
+            return format % (num, unit)
+        num /= 1024.0
+    return format % (num, 'T')
