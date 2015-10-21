@@ -13,6 +13,6 @@ setup(
     license='MIT',
     url='http://github.com/paul-nechifor/ohmu',
     test_suite='nose.collector',
-    tests_require=['nose'],
+    tests_require=['nose', 'mock==1.0.1'],
     install_requires=['scandir'],
 )
