@@ -14,4 +14,5 @@ setup(
     url='http://github.com/paul-nechifor/ohmu',
     test_suite='nose.collector',
     tests_require=['nose'],
+    install_requires=['scandir'],
 )

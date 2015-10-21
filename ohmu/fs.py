@@ -1,7 +1,8 @@
-import os
 from os.path import abspath, basename, join
 from stat import S_ISDIR, S_ISREG
 from threading import RLock, Thread
+
+from scandir import scandir
 
 from .utils import format_size
 
@@ -78,24 +79,23 @@ class Scanner(Thread):
         dirs = []
         with self.lock:
             try:
-                dir_list = os.listdir(parent.path)
+                dir_list = scandir(parent.path)
             except OSError:
                 pass
             else:
                 for f in dir_list:
-                    path = join(parent.path, f)
-                    if os.path.islink(path):
+                    if f.is_symlink():
                         continue
                     try:
-                        stat = os.stat(path)
+                        stat = f.stat()
                     except OSError:
                         continue
                     mode = stat.st_mode
                     if S_ISDIR(mode):
-                        dir = File(f, is_dir=True)
+                        dir = File(f.name, is_dir=True)
                         parent.add_child(dir)
                         dirs.append(dir)
                     elif S_ISREG(mode):
-                        parent.add_child(File(f, size=stat.st_size))
+                        parent.add_child(File(f.name, size=stat.st_size))
         for dir in dirs:
             self.scan(dir)

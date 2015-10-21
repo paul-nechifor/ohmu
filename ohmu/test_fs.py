@@ -6,6 +6,7 @@ from tempfile import mkdtemp
 import sys
 
 from mock import Mock, patch
+from scandir import scandir
 
 from . import fs
 from .utils import TestCase
@@ -103,17 +104,13 @@ class Scanner(TestCase):
         }
 
         with self.file_structure(structure) as d:
-            real_listdir = os.listdir
 
-            with patch.object(fs.os, 'listdir') as listdir:
+            def scandir_func(*args, **kwargs):
+                ret = scandir(*args, **kwargs)
+                os.remove(join(d, 'd1', 'b'))
+                return ret
 
-                def listdir_func(*args, **kwargs):
-                    ret = real_listdir(*args, **kwargs)
-                    os.remove(join(d, 'd1', 'b'))
-                    return ret
-
-                listdir.side_effect = listdir_func
-
+            with patch('ohmu.fs.scandir', side_effect=scandir_func):
                 scanner = self.get_scan(join(d, 'd1'))
 
         self.equalities(
