@@ -2,9 +2,7 @@ from itertools import chain, repeat
 import curses
 import math
 import os
-import sys
-
-xrange = range if sys.version_info[0] == 3 else xrange
+from builtins import range
 
 
 class Canvas(object):
@@ -13,8 +11,8 @@ class Canvas(object):
         self.width = width
         self.height = height
         self.table = [
-            [[' ', 2] for y in xrange(width)]
-            for i in xrange(height)
+            [[' ', 2] for y in range(width)]
+            for i in range(height)
         ]
 
     def draw(self, file):
@@ -27,8 +25,8 @@ class Canvas(object):
         name = object.name
 
         color = 1 + l % 6 if object.is_dir else 0
-        for x in xrange(dx):
-            for y in xrange(dy):
+        for x in range(dx):
+            for y in range(dy):
                 t[sy + y][sx + x][1] = color
 
         if dx == 1 and dy == 1:
@@ -75,11 +73,11 @@ class Canvas(object):
             )
 
     def fill_vertical(self, t, sx, sy, ny):
-        for i in xrange(ny):
+        for i in range(ny):
             t[sy + i][sx][0] = curses.ACS_VLINE
 
     def fill_horizontal(self, t, sx, sy, nx):
-        for i in xrange(nx):
+        for i in range(nx):
             t[sy][sx + i][0] = curses.ACS_HLINE
 
     def fill_horizontal_name(self, name, t, sx, sy, nx):
