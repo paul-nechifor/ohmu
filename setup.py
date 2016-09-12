@@ -10,7 +10,7 @@ if sys.version_info[0] == 2:
 
 setup(
     name='ohmu',
-    version='0.5.0',
+    version='1.0.0',
     author='Paul Nechifor',
     author_email='paul@nechifor.net',
     description='View space usage in your terminal.',
