@@ -37,14 +37,18 @@ Scan some random directory::
 
     ohmu some/random/dir
 
-Tests
------
+Development
+-----------
 
-Run::
+Make sure you have [tox][tox] installed globally.
 
-    ./scripts/test cover
+Run the tests with::
+
+    tox
 
 License
 -------
 
 MIT
+
+[tox]: https://tox.readthedocs.io/en/latest/

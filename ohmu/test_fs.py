@@ -4,13 +4,18 @@ from contextlib import contextmanager
 from os.path import join
 from tempfile import mkdtemp
 
+from past.builtins import basestring
+
 from mock import Mock, patch
-from scandir import scandir
 
 from . import fs
 from .utils import TestCase
 
-from past.builtins import basestring
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
+
 
 class File(TestCase):
 

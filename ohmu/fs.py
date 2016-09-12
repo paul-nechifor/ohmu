@@ -2,9 +2,12 @@ from os.path import abspath, basename, join
 from stat import S_ISDIR, S_ISREG
 from threading import RLock, Thread
 
-from scandir import scandir
-
 from .utils import format_size
+
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
 
 
 class File(object):

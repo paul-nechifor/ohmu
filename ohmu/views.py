@@ -1,8 +1,8 @@
-from itertools import chain, repeat
 import curses
 import math
 import os
 from builtins import range
+from itertools import chain, repeat
 
 
 class Canvas(object):

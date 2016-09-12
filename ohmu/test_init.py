@@ -1,5 +1,6 @@
-from mock import Mock, patch
 import curses
+
+from mock import Mock, patch
 
 from . import Ohmu, entry_point, main, sys
 from .utils import TestCase

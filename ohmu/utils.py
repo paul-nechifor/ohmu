@@ -1,6 +1,6 @@
-from unittest import TestCase as BaseTestCase
-import re
 import curses
+import re
+from unittest import TestCase as BaseTestCase
 
 from past.builtins import basestring
 

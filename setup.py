@@ -1,4 +1,12 @@
+import sys
 from setuptools import setup, find_packages
+
+install_requires = [
+    'future==0.15.2',
+]
+
+if sys.version_info[0] == 2:
+    install_requires.append('scandir==1.3')
 
 setup(
     name='ohmu',
@@ -13,6 +21,9 @@ setup(
     license='MIT',
     url='http://github.com/paul-nechifor/ohmu',
     test_suite='nose.collector',
-    tests_require=['nose', 'mock==1.0.1'],
-    install_requires=['scandir', 'future'],
+    tests_require=[
+        'nose==1.3.7',
+        'mock==1.0.1',
+    ],
+    install_requires=install_requires,
 )
