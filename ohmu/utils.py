@@ -1,9 +1,8 @@
 from unittest import TestCase as BaseTestCase
 import re
 import curses
-import sys
 
-basestring = str if sys.version_info[0] == 3 else basestring
+from past.builtins import basestring
 
 
 class TestCase(BaseTestCase):

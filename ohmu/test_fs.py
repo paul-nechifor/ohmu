@@ -3,7 +3,6 @@ import shutil
 from contextlib import contextmanager
 from os.path import join
 from tempfile import mkdtemp
-import sys
 
 from mock import Mock, patch
 from scandir import scandir
@@ -11,8 +10,7 @@ from scandir import scandir
 from . import fs
 from .utils import TestCase
 
-basestring = str if sys.version_info[0] == 3 else basestring
-
+from past.builtins import basestring
 
 class File(TestCase):
 

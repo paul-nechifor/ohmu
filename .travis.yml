@@ -4,6 +4,6 @@ python:
   - "3.5"
 script: nosetests --with-coverage --cover-erase --cover-package=ohmu
 before_install:
-  pip install codecov scandir
+  pip install codecov scandir future
 after_success:
   codecov
