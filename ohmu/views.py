@@ -98,7 +98,9 @@ class Canvas(object):
         dx = tx - sx + 1
         dy = ty - sy + 1
         ratio = sizes[0] / float(sizes[0] + sizes[1])
-        if dx > dy:
+
+        small_boxes = dx <= 2 or dy <= 2
+        if (small_boxes and dx > dy) or (not small_boxes and dx > dy * 2):
             dx2 = int(math.ceil(dx * ratio))
             self.draw_children(
                 lists[0], l,
@@ -131,6 +133,12 @@ class Canvas(object):
     @classmethod
     def split_in_two(cls, files):
         assert len(files) >= 2
+
+        # This works by creating two lists:
+        #   - the left list with the first element (the largest file).
+        #   - the right list with the last element (the smallest file).
+        # ...and the the remaining files are added to the current smallest list
+        # so as to get them to ballance the file sizes.
 
         list_l, list_r = [files[0]], [files[-1]]
         size_l, size_r = files[0].draw_size, files[-1].draw_size
