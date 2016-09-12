@@ -40,7 +40,7 @@ Scan some random directory::
 Development
 -----------
 
-Make sure you have [tox][tox] installed globally.
+Make sure you have Tox_ installed globally.
 
 Run the tests with::
 
@@ -51,4 +51,4 @@ License
 
 MIT
 
-[tox]: https://tox.readthedocs.io/en/latest/
+.. _Tox: https://tox.readthedocs.io/en/latest/
