@@ -1,3 +1,4 @@
+import time
 from os.path import abspath, basename, join
 from stat import S_ISDIR, S_ISREG
 from threading import RLock, Thread
@@ -65,6 +66,7 @@ class Scanner(Thread):
         path = abspath(root_path)
         self.root = File(basename(path), is_dir=True, path=path)
         self.exception = None
+        self.last_update = time.time()
 
     def run(self):
         try:
@@ -81,6 +83,7 @@ class Scanner(Thread):
     def scan(self, parent):
         dirs = []
         with self.lock:
+            self.last_update = time.time()
             try:
                 dir_list = scandir(parent.path)
             except OSError:

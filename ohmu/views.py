@@ -1,6 +1,7 @@
 import curses
 import math
 import os
+import time
 from builtins import range
 from itertools import chain, repeat
 
@@ -168,6 +169,7 @@ class Screen(object):
         self.width = -1
         self.started = False
         self.screen = None
+        self.using_new_screen_size = True
 
         # Use a short delay for sending the Escape key (but don't override it
         # if it's set).
@@ -188,9 +190,15 @@ class Screen(object):
         self.screen.nodelay(True)
         self.update_size()
 
-    def tick(self, tick, scanner):
-        canvas = Canvas(self.width, self.height)
+    def tick(self, scanner):
         with scanner.lock:
+            file_system_is_old = time.time() - scanner.last_update > 1
+            if self.using_new_screen_size:
+                self.using_new_screen_size = False
+            elif file_system_is_old:
+                return
+
+            canvas = Canvas(self.width, self.height)
             scanner.root.sortAll()
             canvas.draw(scanner.root)
 
@@ -204,6 +212,7 @@ class Screen(object):
 
     def update_size(self):
         self.height, self.width = self.screen.getmaxyx()
+        self.using_new_screen_size = True
 
     def get_key_sequence(self):
         """Returns a key, or key sequence."""

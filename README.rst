@@ -27,7 +27,7 @@ Install the Python headers (TODO: specify the commands on every major OS.)
 
 Install (prefix with ``sudo`` if you need to)::
 
-    pip install ohmu --upgrade
+    pip install ohmu --user --upgrade
 
 Scan the current directory::
 
