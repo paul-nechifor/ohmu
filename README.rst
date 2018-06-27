@@ -1,3 +1,8 @@
+This repository has been moved to `gitlab.com/paul-nechifor/ohmu <http://gitlab.com/paul-nechifor/ohmu>`_.
+==========================================================================================================
+
+Old readme:
+
 Ohmu
 ====
 
